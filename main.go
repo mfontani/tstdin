@@ -14,6 +14,5 @@ var WantsColors = false
 
 func main() {
 	dealWithArgs()
-	stdOut := os.Stdout
-	timestamp(realClock{}, os.Stdin, stdOut, WantsColors)
+	timestamp(realClock{}, os.Stdin, os.Stdout, WantsColors)
 }
