@@ -52,11 +52,9 @@ func dealWithArgs() {
 				wantsHelp = true
 			}
 		}
-		if wantsVersion || wantsHelp {
+		if wantsVersion {
 			fmt.Printf("%s\n", Version)
-			if wantsHelp {
-				fmt.Println("")
-			}
+			os.Exit(0)
 		}
 		if wantsHelp {
 			fmt.Println("Usage: tstdin [OPTIONS]")
@@ -85,8 +83,7 @@ func dealWithArgs() {
 			fmt.Println("  -version  Shows the program's version")
 			fmt.Println("  -color    Force color on regardless of environment")
 			fmt.Println("  -no-color Force color off regardless of environment")
-		}
-		if wantsVersion || wantsHelp {
+			fmt.Printf("\nThis is tstdin %s\n", Version)
 			os.Exit(0)
 		}
 	}
