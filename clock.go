@@ -56,14 +56,10 @@ func (c monotonicClock) Sub(t time.Time) time.Duration {
 	return when.Sub(t)
 }
 
-// To ensure MonotonicClock can do its thing, create an instance of it which
-// gets changed by all calls to Now() and friends.
-var theMonotonicClock monotonicClock
-
 // MonotonicClock creates a new "stuck" clock, which starts at the given sec,
 // nsec and whenever Now() is called, it returns the last time incremented by
 // the given delta seconds and nsec.
 func MonotonicClock(sec, nsec, secIncrease, nsecIncrease int64) Time {
-	theMonotonicClock = monotonicClock{sec: sec, nsec: nsec, secIncrease: secIncrease, nsecIncrease: nsecIncrease}
-	return &theMonotonicClock
+	mc := monotonicClock{sec: sec, nsec: nsec, secIncrease: secIncrease, nsecIncrease: nsecIncrease}
+	return &mc
 }
