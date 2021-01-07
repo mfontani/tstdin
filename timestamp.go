@@ -24,7 +24,6 @@ func niceDuration(d time.Duration) string {
 func timestamp(clock Time, r io.Reader, w io.Writer, wantsColors bool) {
 	scanner := bufio.NewScanner(r)
 	startTime := clock.Now()
-	// lastLine := clock.Now()
 	lastLine := startTime
 	for scanner.Scan() {
 		nowTime := clock.Now()
