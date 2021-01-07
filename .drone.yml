@@ -1,0 +1,89 @@
+---
+kind: pipeline
+name: build_linux_amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+volumes:
+  - name: deps
+    temp: {}
+
+steps:
+  # Ensure we also fetch tags, to later allow "git describe --tags" to work
+  # https://docs.drone.io/pipeline/docker/syntax/cloning/#the---tags-flag
+  - name: fetch
+    image: mfontani/gobuzz
+    pull: "always"  # ensure image is up to date at start of pipeline
+    commands:
+      - git fetch --tags
+  - name: deps
+    image: mfontani/gobuzz
+    pull: "never"   # pulled on previous step
+    depends_on:
+      - fetch
+    volumes:
+      - name: deps
+        path: /go
+    commands:
+      - go mod download
+  - name: vetting
+    image: mfontani/gobuzz
+    pull: "never"   # pulled on previous step
+    depends_on:
+      - fetch
+      - deps
+    volumes:
+      - name: deps
+        path: /go
+    commands:
+      - go vet
+  - name: test
+    image: mfontani/gobuzz
+    pull: "never"   # pulled on previous step
+    depends_on:
+      - fetch
+      - deps
+    commands:
+      # The env var TEST=... and TZ are used in tests
+      - TZ=UTC go test -bench=.
+  - name: binary
+    image: mfontani/gobuzz
+    pull: "never"   # pulled on previous step
+    depends_on:
+      - deps
+      - vetting
+      - test
+    volumes:
+      - name: deps
+        path: /go
+    commands:
+      # Build it...
+      - GOOS=linux GOARCH=amd64 CGO_ENABLED=0 .dev/build-static.sh
+      # This ends up being about 2-3 MiB
+      - ls -la tstdin
+      # Ensure it works...
+      - ./tstdin -version
+      - sh -c '(echo foo ; sleep 1; echo bar ; sleep 1 ; echo baz) | ./tstdin'
+  - name: gitea_release
+    image: plugins/gitea-release
+    pull: "always"  # ensure image is up to date!
+    depends_on:
+      - binary
+    settings:
+      api_key:
+        from_secret: gitea_token
+      base_url: https://git.marcofontani.it
+      title: ${DRONE_TAG}
+      checksum:
+        - sha1
+        - sha256
+        - sha512
+      files:
+        - ./tstdin
+    when:
+      event:
+        - tag
+
+...

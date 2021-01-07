@@ -1,0 +1,59 @@
+---
+name: Release
+"on":
+  push:
+    tags:
+      - '*'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+    container: mfontani/gobuzz
+    steps:
+      - uses: actions/checkout@v2
+      - run: go mod download
+      - run: ./.dev/build-static.sh
+      # Ensure it runs...
+      - run: ./tstdin -help
+      - run: sh -c '(echo foo ; sleep 1; echo bar ; sleep 1 ; echo baz) | ./tstdin'
+      # Compress and upload...
+      - run: xz --compress --stdout tstdin > tstdin.xz
+      - uses: actions/upload-artifact@master
+        with:
+          name: tstdin.xz
+          path: tstdin.xz
+
+  release:
+    needs: [build]
+    runs-on: ubuntu-20.04
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url}}
+    steps:
+      - id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+
+  upload:
+    needs: [release]
+    strategy:
+      matrix:
+        file: ['tstdin.xz']
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: ${{ matrix.file }}
+          path: .
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./${{ matrix.file }}
+          asset_name: ${{ matrix.file }}
+          asset_content_type: application/x-xz
