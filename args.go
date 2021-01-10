@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 // automatically turn colors on/off depending on the circumstances in which
@@ -53,13 +54,34 @@ func dealWithArgs() {
 		wantsVersion := false
 		wantsHelp := false
 		spuriousArgs := false
-		for _, v := range os.Args[1:] {
+		skipArg := false
+		for i, v := range os.Args[1:] {
+			if skipArg {
+				skipArg = false
+				continue
+			}
 			if v == "-version" || v == "--version" {
 				wantsVersion = true
 			} else if v == "-help" || v == "--help" {
 				wantsHelp = true
 			} else if v == "-nocolor" || v == "--nocolor" || v == "-no-color" || v == "--no-color" {
 			} else if v == "-color" || v == "--color" {
+			} else if v == "-buffered" || v == "--buffered" {
+				WantsBuffered = true
+			} else if v == "-flushevery" || v == "--flushevery" || v == "-flush-every" || v == "--flush-every" {
+				WantsBuffered = true
+				if len(os.Args) > i {
+					var err error
+					FlushEvery, err = strconv.Atoi(os.Args[i+2])
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "Bad argument %s=%s. Need a numeric value representing ms. See --help.\n", v, os.Args[i+2])
+						os.Exit(1)
+					}
+					skipArg = true
+				} else {
+					fmt.Fprintf(os.Stderr, "Bad arguments. %s wants a value in ms. No argument given. See --help.\n", v)
+					os.Exit(1)
+				}
 			} else {
 				spuriousArgs = true
 			}
@@ -95,6 +117,9 @@ func dealWithArgs() {
 			fmt.Println("  -version  Shows the program's version")
 			fmt.Println("  -color    Force color on regardless of environment")
 			fmt.Println("  -no-color Force color off regardless of environment")
+			fmt.Printf("  -buffered Buffers stdout for output (might be faster), flushing every %dms\n", FlushEvery)
+			fmt.Printf("  -flush-every MS (default: %d)\n", FlushEvery)
+			fmt.Println("            Choose how often stdout is flushed. Implies -buffered.")
 			fmt.Printf("\nThis is tstdin %s\n", Version)
 			os.Exit(0)
 		}
