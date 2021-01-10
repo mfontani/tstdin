@@ -27,15 +27,23 @@ func setWantsColors() {
 		WantsColors = false
 	}
 	// The user might want to override either behaviour
-	if len(os.Args) == 2 {
-		arg := os.Args[1]
-		if arg == "-color" || arg == "--color" {
+	overrodeColor := false
+	overrodeNoColor := false
+	for _, v := range os.Args[1:] {
+		if v == "-color" || v == "--color" {
 			WantsColors = true
-		} else if arg == "-nocolor" || arg == "--nocolor" {
+			overrodeColor = true
+		} else if v == "-nocolor" || v == "--nocolor" {
 			WantsColors = false
-		} else if arg == "-no-color" || arg == "--no-color" {
+			overrodeNoColor = true
+		} else if v == "-no-color" || v == "--no-color" {
 			WantsColors = false
+			overrodeNoColor = true
 		}
+	}
+	if overrodeColor && overrodeNoColor {
+		fmt.Fprintf(os.Stderr, "Can't override both -color and -nocolor. See --help.\n")
+		os.Exit(1)
 	}
 }
 
@@ -44,12 +52,16 @@ func dealWithArgs() {
 	if len(os.Args) > 1 {
 		wantsVersion := false
 		wantsHelp := false
+		spuriousArgs := false
 		for _, v := range os.Args[1:] {
 			if v == "-version" || v == "--version" {
 				wantsVersion = true
-			}
-			if v == "-help" || v == "--help" {
+			} else if v == "-help" || v == "--help" {
 				wantsHelp = true
+			} else if v == "-nocolor" || v == "--nocolor" || v == "-no-color" || v == "--no-color" {
+			} else if v == "-color" || v == "--color" {
+			} else {
+				spuriousArgs = true
 			}
 		}
 		if wantsVersion {
@@ -86,23 +98,10 @@ func dealWithArgs() {
 			fmt.Printf("\nThis is tstdin %s\n", Version)
 			os.Exit(0)
 		}
-	}
-	if len(os.Args) != 1 {
-		if len(os.Args) == 2 {
-			arg := os.Args[1]
-			// These args are okay:
-			if arg == "-color" || arg == "--color" {
-				return
-			}
-			if arg == "-nocolor" || arg == "--nocolor" {
-				return
-			}
-			if arg == "-no-color" || arg == "--no-color" {
-				return
-			}
+		if spuriousArgs {
+			fmt.Fprintf(os.Stderr, "Bad arguments. See --help.\n")
+			os.Exit(1)
 		}
-		fmt.Fprintf(os.Stderr, "This command takes no arguments. See --help.\n")
-		os.Exit(1)
 	}
 	setWantsColors()
 }
