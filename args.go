@@ -83,6 +83,7 @@ func dealWithArgs() {
 					os.Exit(1)
 				}
 			} else {
+				fmt.Fprintf(os.Stderr, "Unknown/unhandled argument %v. See --help.\n", v)
 				spuriousArgs = true
 			}
 		}
@@ -124,7 +125,6 @@ func dealWithArgs() {
 			os.Exit(0)
 		}
 		if spuriousArgs {
-			fmt.Fprintf(os.Stderr, "Bad arguments. See --help.\n")
 			os.Exit(1)
 		}
 	}
