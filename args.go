@@ -70,7 +70,7 @@ func dealWithArgs() {
 				WantsBuffered = true
 			} else if v == "-flushevery" || v == "--flushevery" || v == "-flush-every" || v == "--flush-every" {
 				WantsBuffered = true
-				if len(os.Args) > i {
+				if len(os.Args) > i+2 {
 					var err error
 					FlushEvery, err = strconv.Atoi(os.Args[i+2])
 					if err != nil {
