@@ -26,6 +26,14 @@ var WantsBuffered = false
 // STDOUT gets flushed.
 var FlushEvery = 500
 
+// ErrorAfter represents after how many ms to mark a line as having been output
+// after "way too long". If colors are enabled, this is shown in red.
+var ErrorAfter int = 60000
+
+// WarnAfter represents after how many ms to mark a line as having been output
+// after "a bit too long". If colors are enabled, this is whoen in yellow.
+var WarnAfter int = 1000
+
 func main() {
 	dealWithArgs()
 	if WantsBuffered {

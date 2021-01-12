@@ -32,10 +32,10 @@ func timestamp(clock Time, r io.Reader, w io.Writer, wantsColors bool) {
 		color := ""
 		reset := ""
 		if wantsColors {
-			if sinceLastLine.Minutes() > 1 {
+			if sinceLastLine.Milliseconds() > int64(ErrorAfter) {
 				color = errorColor
 				reset = resetColor
-			} else if sinceLastLine.Seconds() > 1 {
+			} else if sinceLastLine.Milliseconds() > int64(WarnAfter) {
 				color = warningColor
 				reset = resetColor
 			}
