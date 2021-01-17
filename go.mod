@@ -1,3 +1,3 @@
-module git.marcofontani.it/mfontani/tstdin
+module github.com/mfontani/tstdin
 
 go 1.15
