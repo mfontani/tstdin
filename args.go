@@ -65,6 +65,14 @@ func dealWithArgs() {
 				wantsHelp = true
 			} else if v == "-nocolor" || v == "--nocolor" || v == "-no-color" || v == "--no-color" {
 			} else if v == "-color" || v == "--color" {
+			} else if v == "-datestamp" || v == "--datestamp" || v == "-date-stamp" || v == "--date-stamp" {
+				WantsDateStamp = true
+			} else if v == "-nodatestamp" || v == "--nodatestamp" || v == "-no-date-stamp" || v == "--no-date-stamp" || v == "-no-datestamp" {
+				WantsDateStamp = false
+			} else if v == "-timestamp" || v == "--timestamp" || v == "-time-stamp" || v == "--time-stamp" || v == "-no-timestamp" {
+				WantsTimeStamp = true
+			} else if v == "-notimestamp" || v == "--notimestamp" || v == "-no-time-stamp" || v == "--no-time-stamp" {
+				WantsTimeStamp = false
 			} else if v == "-buffered" || v == "--buffered" {
 				WantsBuffered = true
 			} else if v == "-flushevery" || v == "--flushevery" || v == "-flush-every" || v == "--flush-every" {
@@ -145,28 +153,30 @@ func dealWithArgs() {
 		fmt.Println("  2031-04-07 14:20:05.953362 00:00:02.001144 00:00:01.001241 baz")
 		fmt.Println("")
 		fmt.Println("Options:")
-		fmt.Println("  -help     Shows this help page")
-		fmt.Println("  -version  Shows the program's version")
-		fmt.Println("  -color    Force color on regardless of environment")
-		fmt.Println("  -no-color Force color off regardless of environment")
-		fmt.Printf("  -buffered Buffers stdout for output (might be faster), flushing every %dms\n", FlushEvery)
+		fmt.Println("  -help         Shows this help page")
+		fmt.Println("  -version      Shows the program's version")
+		fmt.Println("  -color        Force color on regardless of environment")
+		fmt.Println("  -no-color     Force color off regardless of environment")
+		fmt.Println("  -no-datestamp Do not output the (1) \"date stamp\" block")
+		fmt.Println("  -no-timestamp Do not output the (1) \"time stamp\" block")
+		fmt.Printf("  -buffered     Buffers stdout for output (might be faster), flushing every %dms\n", FlushEvery)
 		fmt.Printf("  -flush-every MS (default: %d)\n", FlushEvery)
-		fmt.Println("            Choose how often stdout is flushed. Implies -buffered.")
+		fmt.Println("                Choose how often stdout is flushed. Implies -buffered.")
 		fmt.Printf("  -error-after MS (default: %d)\n", ErrorAfter)
-		fmt.Println("            Choose after how many ms from the previous line was received to")
-		fmt.Println("            declare a line took way too long to appear, and display the (3)")
+		fmt.Println("                Choose after how many ms from the previous line was received to")
+		fmt.Println("                declare a line took way too long to appear, and display the (3)")
 		if WantsColors {
-			fmt.Println("            chunk in \033[31mred\033[0m if colors are enabled.")
+			fmt.Println("                chunk in \033[31mred\033[0m if colors are enabled.")
 		} else {
-			fmt.Println("            chunk in red if colors are enabled.")
+			fmt.Println("                chunk in red if colors are enabled.")
 		}
 		fmt.Printf("  -warn-after MS (default: %d)\n", WarnAfter)
-		fmt.Println("            Choose after how many ms from the previous line was received to")
-		fmt.Println("            declare a line took a bit too long to appear, and display the (3)")
+		fmt.Println("                Choose after how many ms from the previous line was received to")
+		fmt.Println("                declare a line took a bit too long to appear, and display the (3)")
 		if WantsColors {
-			fmt.Println("            chunk in \033[33myellow\033[0m if colors are enabled.")
+			fmt.Println("                chunk in \033[33myellow\033[0m if colors are enabled.")
 		} else {
-			fmt.Println("            chunk in yellow if colors are enabled.")
+			fmt.Println("                chunk in yellow if colors are enabled.")
 		}
 		fmt.Printf("\nThis is tstdin %s\n", Version)
 		os.Exit(0)

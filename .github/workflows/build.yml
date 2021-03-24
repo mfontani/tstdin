@@ -31,3 +31,4 @@ jobs:
       # Ensure it runs...
       - run: ./tstdin -help
       - run: sh -c '(echo foo ; sleep 1; echo bar ; sleep 1 ; echo baz) | ./tstdin'
+      - run: sh -c '(echo foo ; sleep 1; echo bar ; sleep 1 ; echo baz) | ./tstdin -no-datestamp -no-timestamp'

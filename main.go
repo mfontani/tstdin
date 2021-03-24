@@ -9,6 +9,15 @@ import (
 // Version contains the binary version. This is added at build time.
 var Version = "uncommitted"
 
+// WantsDateStamp represents whether the output should contain the YYYY-MM-DD
+// representation of the date at which the output line was received.
+var WantsDateStamp = true
+
+// WantsTimeStamp represents whether the output should contain the
+// HH:MM:SS.NNNNNN representation of the time at which the output line was
+// received.
+var WantsTimeStamp = true
+
 // WantsColors represents whether the output should contain colors if the time
 // between two subsequent lines "took too long".
 // This is automatically toggled.

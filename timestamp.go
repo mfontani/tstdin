@@ -40,8 +40,16 @@ func timestamp(clock Time, r io.Reader, w io.Writer, wantsColors bool) {
 				reset = resetColor
 			}
 		}
-		fmt.Fprintf(w, "%s %s %s%s%s %s\n",
-			nowTime.Format("2006-01-02 15:04:05.000000"),
+		lineDate := ""
+		if WantsDateStamp {
+			lineDate = nowTime.Format("2006-01-02 ")
+		}
+		lineTime := ""
+		if WantsTimeStamp {
+			lineTime = nowTime.Format("15:04:05.000000 ")
+		}
+		fmt.Fprintf(w, "%s%s%s %s%s%s %s\n",
+			lineDate, lineTime,
 			niceDuration(sinceStart),
 			color,
 			niceDuration(sinceLastLine),
