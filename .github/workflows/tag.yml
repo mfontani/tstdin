@@ -65,13 +65,12 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
 
-  upload:
+  uploadxz:
     needs: [release]
     strategy:
       matrix:
         file:
           - tstdin.linux.amd64.xz
-          - tstdin.exe
           - tstdin.darwin.amd64.xz
     runs-on: ubuntu-20.04
     steps:
@@ -86,3 +85,25 @@ jobs:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ./${{ matrix.file }}
           asset_name: ${{ matrix.file }}
+          asset_content_type: application/x-xz
+
+  uploadexe:
+    needs: [release]
+    strategy:
+      matrix:
+        file:
+          - tstdin.exe
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: ${{ matrix.file }}
+          path: .
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./${{ matrix.file }}
+          asset_name: ${{ matrix.file }}
+          asset_content_type: application/vnd.microsoft.portable-executable
