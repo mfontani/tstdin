@@ -17,16 +17,39 @@ jobs:
       - run: go test ./...
         env:
           TZ: UTC
+      # Build #1: linux/amd64
       - run: ./.dev/build-static.sh
-      # Ensure it runs...
+        env:
+          GOOS: linux
+          GOARCH: amd64
       - run: ./tstdin -help
       - run: sh -c '(echo foo ; sleep 1; echo bar ; sleep 1 ; echo baz) | ./tstdin'
-      # Compress and upload...
-      - run: xz --compress --stdout tstdin > tstdin.xz
+      - run: xz --compress --stdout tstdin > tstdin.linux.amd64.xz
+      # Build #2: windows/amd64
+      - run: ./.dev/build-static.sh
+        env:
+          GOOS: windows
+          GOARCH: amd64
+      - run: mv tstdin tstdin.exe
+      # Build #3: darwin/amd64
+      - run: ./.dev/build-static.sh
+        env:
+          GOOS: darwin
+          GOARCH: amd64
+      - run: xz --compress --stdout tstdin > tstdin.darwin.amd64.xz
+      # Upload artifacts...
       - uses: actions/upload-artifact@master
         with:
-          name: tstdin.xz
-          path: tstdin.xz
+          name: tstdin.linux.amd64.xz
+          path: tstdin.linux.amd64.xz
+      - uses: actions/upload-artifact@master
+        with:
+          name: tstdin.exe
+          path: tstdin.exe
+      - uses: actions/upload-artifact@master
+        with:
+          name: tstdin.darwin.amd64.xz
+          path: tstdin.darwin.amd64.xz
 
   release:
     needs: [build]
@@ -46,7 +69,10 @@ jobs:
     needs: [release]
     strategy:
       matrix:
-        file: ['tstdin.xz']
+        file:
+          - tstdin.linux.amd64.xz
+          - tstdin.exe
+          - tstdin.darwin.amd64.xz
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/download-artifact@master
@@ -60,4 +86,3 @@ jobs:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ./${{ matrix.file }}
           asset_name: ${{ matrix.file }}
-          asset_content_type: application/x-xz

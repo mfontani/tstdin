@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go build -tags timetzdata --ldflags "-X 'main.Version=$(git describe --tags)' -linkmode external -extldflags \"-static\" -s -w" -o tstdin .
+go build -tags timetzdata --ldflags "-X 'main.Version=$(git describe --tags)' -extldflags \"-static\" -s -w" -o tstdin .
